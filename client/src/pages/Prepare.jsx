@@ -47,7 +47,7 @@ const Prepare = () => {
 
         try {
             setIsLoading(true);
-            const response = await axios.post('http://localhost:9860/generate-questions', formData);
+            const response = await axios.post('https://interviewmate-1z6k.onrender.com/generate-questions', formData);
             setQuestions(response.data.text);
         } catch (error) {
             setError('Error generating questions. Please try again.');
