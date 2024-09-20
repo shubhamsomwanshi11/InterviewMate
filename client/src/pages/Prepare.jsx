@@ -45,7 +45,7 @@ const Prepare = () => {
 
         try {
             setIsLoading(true);
-            const response = await axios.post('http://localhost:9860/generate-questions', formData);
+            const response = await axios.post('https://interviewmate-baxj.onrender.com/generate-questions', formData);
             setQuestions(response.data.text);
 
         } catch (error) {
@@ -69,6 +69,7 @@ const Prepare = () => {
         });
         setQuestions('');
         setError('');
+        setFeedback('');
     };
 
     const getFeedback = async () => {
@@ -80,7 +81,7 @@ const Prepare = () => {
 
         try {
             setIsLoading(true);
-            const response = await axios.post('http://localhost:9860/generate-feedback', { answer: userAnswer });
+            const response = await axios.post('https://interviewmate-baxj.onrender.com/generate-feedback', { answer: userAnswer });
             setFeedback(response.data.feedback);  // Assuming the API returns feedback in the `feedback` field
         } catch (error) {
             setError('Error generating feedback. Please try again.');
