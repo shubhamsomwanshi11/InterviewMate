@@ -17,7 +17,7 @@ app.use(cors());
 
 // API endpoint to handle user input and generate interview questions
 app.post('/generate-questions', async (req, res) => {
-  const { jobTitle, companyInfo, jobDescription, experience, focusArea, qualifications, skills, hobbies, competencies } = req.body;
+  const { jobTitle, companyInfo, jobDescription, experience, focusArea, qualifications, skills } = req.body;
 
   // Double-check for missing fields
   if (!jobTitle || !jobDescription || !experience || !qualifications || !skills) {
@@ -25,7 +25,7 @@ app.post('/generate-questions', async (req, res) => {
   }
 
   // Build the prompt based on the new data structure
-  const prompt = `Generate interview questions for a ${jobTitle} candidate at ${companyInfo} with ${qualifications} and ${skills}. The candidate has ${experience} years of experience and their focus area is ${focusArea}. They mentioned ${hobbies} as hobbies and ${competencies} as competencies. Generate questions at a moderate difficulty level.`;
+  const prompt = `Generate interview questions for a ${jobTitle} candidate at ${companyInfo} with ${qualifications} and ${skills}. The candidate has ${experience} years of experience and their focus area is ${focusArea}. Generate questions at a moderate difficulty level.`;
 
   try {
     const result = await model.generateContent(prompt);
@@ -36,6 +36,28 @@ app.post('/generate-questions', async (req, res) => {
     res.status(500).json({ error: 'Failed to generate questions' });
   }
 });
+
+app.post('/generate-feedback', async (req, res) => {
+  const { answer } = req.body;
+
+  // Double-check for missing fields
+  if (!answer) {
+    return res.status(400).json({ error: 'Missing answer field in request body' });
+  }
+
+  // Build the prompt for feedback generation
+  const prompt = `Provide constructive feedback for the following answer: "${answer}". Highlight strengths and areas of improvement, with specific examples.`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const feedback = result.response.candidates[0].content.parts[0].text;
+    res.json({ feedback });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Failed to generate feedback' });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);

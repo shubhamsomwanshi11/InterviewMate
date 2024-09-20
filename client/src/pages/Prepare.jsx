@@ -11,16 +11,14 @@ const Prepare = () => {
         jobTitle: '',
         companyInfo: '',
         jobDescription: '',
-        experience: '',
+        experience: 'Fresher',
         focusArea: '',
         qualifications: '',
         skills: '',
-        hobbies: '',
-        competencies: ''
     });
 
-    const [loading,setIsLoading] = useState(false);
-
+    const [loading, setIsLoading] = useState(false);
+    const [feedback, setFeedback] = useState('');
     const [questions, setQuestions] = useState('');
     const [error, setError] = useState('');
 
@@ -30,7 +28,7 @@ const Prepare = () => {
 
     const validateForm = () => {
         // Basic validation example
-        if (!formData.jobTitle || !formData.companyInfo || !formData.jobDescription || !formData.experience || !formData.focusArea || !formData.qualifications || !formData.skills || !formData.competencies) {
+        if (!formData.jobTitle || !formData.companyInfo || !formData.jobDescription || !formData.experience || !formData.focusArea || !formData.qualifications || !formData.skills ) {
             setError("Please fill out all required fields.");
             return false;
         }
@@ -47,13 +45,14 @@ const Prepare = () => {
 
         try {
             setIsLoading(true);
-            const response = await axios.post('https://interviewmate-1z6k.onrender.com/generate-questions', formData);
+            const response = await axios.post('http://localhost:9860/generate-questions', formData);
             setQuestions(response.data.text);
+
         } catch (error) {
             setError('Error generating questions. Please try again.');
             console.log(error);
         }
-        finally{
+        finally {
             setIsLoading(false);
         }
     };
@@ -67,13 +66,31 @@ const Prepare = () => {
             focusArea: '',
             qualifications: '',
             skills: '',
-            hobbies: '',
-            competencies: ''
         });
         setQuestions('');
         setError('');
     };
-    if(loading)return <Loader/>
+
+    const getFeedback = async () => {
+        const userAnswer = document.getElementById('userans').value;
+        if (!userAnswer) {
+            setError('Please provide an answer to get feedback.');
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+            const response = await axios.post('http://localhost:9860/generate-feedback', { answer: userAnswer });
+            setFeedback(response.data.feedback);  // Assuming the API returns feedback in the `feedback` field
+        } catch (error) {
+            setError('Error generating feedback. Please try again.');
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (loading) return <Loader />
     return (
         <div className="container mt-5">
             <div className="card border-0 shadow rounded">
@@ -83,43 +100,35 @@ const Prepare = () => {
                     <form onSubmit={handleSubmit}>
                         <div className="row">
                             <div className="col-md-6 mb-3">
-                                <label htmlFor="jobTitle" className="form-label">Job Title</label>
+                                <label htmlFor="jobTitle" className="form-label fw-semibold">Job Title</label>
                                 <input type="text" className="form-control" id="jobTitle" value={formData.jobTitle} onChange={handleChange} placeholder="Enter Job Title" />
                             </div>
                             <div className="col-md-6 mb-3">
-                                <label htmlFor="companyInfo" className="form-label">Company Information</label>
+                                <label htmlFor="companyInfo" className="form-label fw-semibold">Company Information</label>
                                 <input type="text" className="form-control" id="companyInfo" value={formData.companyInfo} onChange={handleChange} placeholder="Company Name, Location" />
                             </div>
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="jobDescription" className="form-label">Job Description</label>
+                            <label htmlFor="jobDescription" className="form-label fw-semibold">Job Description</label>
                             <textarea className="form-control" id="jobDescription" value={formData.jobDescription} onChange={handleChange} rows="3" placeholder="Describe the job responsibilities"></textarea>
                         </div>
                         <div className="row">
                             <div className="col-md-6 mb-3">
-                                <label htmlFor="experience" className="form-label">Experience Needed</label>
+                                <label htmlFor="experience" className="form-label fw-semibold">Experience Needed</label>
                                 <input type="text" className="form-control" id="experience" value={formData.experience} onChange={handleChange} placeholder="Years of experience required" />
                             </div>
                             <div className="col-md-6 mb-3">
-                                <label htmlFor="focusArea" className="form-label">Focus Area (Department/Team)</label>
+                                <label htmlFor="focusArea" className="form-label fw-semibold">Focus Area (Department/Team)</label>
                                 <input type="text" className="form-control" id="focusArea" value={formData.focusArea} onChange={handleChange} placeholder="Department or Team the role belongs to" />
                             </div>
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="qualifications" className="form-label">Qualifications</label>
+                            <label htmlFor="qualifications" className="form-label fw-semibold">Qualifications</label>
                             <input type="text" className="form-control" id="qualifications" value={formData.qualifications} onChange={handleChange} placeholder="List required educational qualifications" />
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="skills" className="form-label">Skills</label>
+                            <label htmlFor="skills" className="form-label fw-semibold">Skills</label>
                             <input type="text" className="form-control" id="skills" value={formData.skills} onChange={handleChange} placeholder="List required technical and soft skills" />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="hobbies" className="form-label">Hobbies (Optional)</label>
-                            <input type="text" className="form-control" id="hobbies" value={formData.hobbies} onChange={handleChange} placeholder="List relevant hobbies (may indicate personality traits)" />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="competencies" className="form-label">Competencies</label>
-                            <input type="text" className="form-control" id="competencies" value={formData.competencies} onChange={handleChange} placeholder="List required technical and behavioral competencies" />
                         </div>
                         <hr />
                         <button type="submit" className="btn btn-primary mx-2">Generate <RiAiGenerate /></button>
@@ -129,6 +138,21 @@ const Prepare = () => {
                         <div className="mt-4">
                             <h5>Generated Questions:</h5>
                             <ReactMarkdown className="bg-light p-3 rounded">{questions}</ReactMarkdown>
+
+                            <div className="mt-4">
+                                <h5>Answer Questions:</h5>
+
+                                <textarea class="form-control" rows={5} name="" id="userans">
+
+                                </textarea>
+                                <div className='d-flex justify-content-end'>
+                                    <button type="button" className="mt-3 btn btn-success" onClick={getFeedback}>Generate Feedback </button>
+                                </div>
+
+                                {feedback && (
+                                    <ReactMarkdown className="bg-light p-3 rounded">{feedback}</ReactMarkdown>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>
