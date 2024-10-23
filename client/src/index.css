@@ -15,3 +15,23 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+
+@media print {
+  /* Hide everything except the .print-container */
+  body * {
+      visibility: hidden;
+  }
+  .print-container, .print-container * {
+      visibility: visible;
+    }
+    .print-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+    .print-container button{
+      visibility: hidden;
+  }
+}
