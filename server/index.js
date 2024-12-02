@@ -6,7 +6,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 dotenv.config(); // Load environment variables from .env file
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
 
 const app = express();
 const port = process.env.PORT || 3000;
