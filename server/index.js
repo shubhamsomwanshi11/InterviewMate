@@ -29,7 +29,7 @@ app.post('/generate-questions', async (req, res) => {
   The candidate's job description involves ${jobDescription}. They are proficient in ${knownLanguages} languages, have technical skills in ${technicalSkills}, and soft skills in ${softSkills}. 
   ${hobbies ? `Their hobbies include ${hobbies}.` : ''} 
   ${achievements ? `They have achieved the following: ${achievements}.` : ''} 
-  Generate at least 10 interview questions focusing on their technical and soft skills, and the job description provided. Ensure each question is numbered in the format "1.", "2.", "3." and so on. Format the questions in the form of an array.`;
+  Generate at least 10 interview questions focusing on their technical and soft skills, and the job description provided. Ensure each question is numbered in the format "1.", "2.", "3." and so on. Format the questions in the form of plain text.`;
 
   try {
     const result = await model.generateContent(prompt);
