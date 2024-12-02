@@ -29,14 +29,19 @@ app.post('/generate-questions', async (req, res) => {
   The candidate's job description involves ${jobDescription}. They are proficient in ${knownLanguages} languages, have technical skills in ${technicalSkills}, and soft skills in ${softSkills}. 
   ${hobbies ? `Their hobbies include ${hobbies}.` : ''} 
   ${achievements ? `They have achieved the following: ${achievements}.` : ''} 
-  Generate questions focusing on their technical and soft skills, and the job description provided. Format the questions in the form of an array. Generate question in number series 1,2,3,4 likewise..`;  
+  Generate at least 10 interview questions focusing on their technical and soft skills, and the job description provided. Ensure each question is numbered in the format "1.", "2.", "3." and so on. Format the questions in the form of an array.`;
+
   try {
     const result = await model.generateContent(prompt);
-    // Assuming the result is a string of questions separated by newlines
+
+    // Assuming the result contains generated content
     const text = result.response.candidates[0].content.parts[0].text;
 
-    // Split the text by newlines or other delimiters to form an array
-    const questionsArray = text.split('\n').filter(q => q.trim() !== '');
+    // Split the text into lines and enforce numbering if necessary
+    const questionsArray = text
+      .split('\n')
+      .map((line, index) => line.trim().startsWith((index + 1) + '.') ? line : `${index + 1}. ${line.trim()}`)
+      .filter(q => q.trim() !== '');
 
     res.json({ questions: questionsArray });
   } catch (error) {
