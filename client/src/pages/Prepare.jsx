@@ -39,9 +39,23 @@ const Prepare = () => {
     };
 
     const extractQuestions = (data) => {
-        // Extracts only numbered questions from the response, ignoring headers or other text
-        return data.filter(line => /^\d+\.\s/.test(line));
+        return data
+            .filter(line => {
+                // Match lines that start with numbers followed by a period and space
+                // Exclude empty lines, brackets, code blocks, and placeholders like "Type answer here"
+                return (
+                    /^\d+\.\s+/.test(line) && 
+                    !/^[\[\]`]+$/.test(line.trim())
+                );
+            })
+            .map(line => line.replace(/^\d+\.\s+/, '').trim()) // Remove numbering and trim spaces
+            .filter(line => line) // Ensure non-empty lines
+            .slice(2, -2); // Discard the first two and last two elements
     };
+    
+    
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -54,7 +68,7 @@ const Prepare = () => {
             setIsLoading(true);
             const response = await axios.post('https://interviewmate-baxj.onrender.com/generate-questions', formData);
             const allQuestions = response.data.questions;
-            const filteredQuestions = extractQuestions(allQuestions); // Use the function to filter out only the questions
+            const filteredQuestions = extractQuestions(allQuestions);
             setQuestions(filteredQuestions);
             setResponses({});
         } catch (error) {
@@ -64,6 +78,7 @@ const Prepare = () => {
             setIsLoading(false);
         }
     };
+
 
     const handleReset = () => {
         setFormData({
@@ -199,7 +214,7 @@ const Prepare = () => {
                     <div className="d-flex justify-content-end">
                         <button
                             className='btn mt-3 text-light btn-lg fw-bold btn-warning'
-                            onClick={() => window.print()} 
+                            onClick={() => window.print()}
                         >
                             Print
                         </button>
